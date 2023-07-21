@@ -13,7 +13,7 @@ namespace E_cart.Data
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<User> Users { get; set; }
-       // public DbSet<WishList> WishList { get; set; }
+        public DbSet<WishList> WishList { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CartDetail> CartDetails { get; set; }
 

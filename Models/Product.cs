@@ -6,9 +6,9 @@ namespace E_cart.Models
     public class Product
     {
         [Key]
-        public Guid Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
 
         [Required]
         [Column(TypeName = "nvarchar(100)")]
@@ -17,9 +17,12 @@ namespace E_cart.Models
         public decimal Price { get; set; } 
         public string? Image { get; set; }
 
-        public ICollection<CartDetail> CartDetails { get; set; }
+        public virtual Category Category { get; set; }
+        public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
 
-        public ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
+        public virtual List<WishList> WishList { get; set; } = new List<WishList>();
 
     }
 }

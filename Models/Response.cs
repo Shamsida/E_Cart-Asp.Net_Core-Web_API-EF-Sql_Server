@@ -1,12 +1,17 @@
-﻿namespace E_cart.Models
+﻿using System.Net;
+
+namespace E_cart.Models
 {
     public class Response
     {
-        public int StatusCode { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
         public string? StatusMessage { get; set; }
-        public List<User> listUser { get; set; }
-        public User user { get; set; }
-        public List<Product> listproduct { get; set; }
-        public Product product { get; set; }
+        public string? Error { get; set; }
+        public bool ? Success { get; set; }
+        public object Result { get; set; }
+        
+       
+        
+      
     }
 }

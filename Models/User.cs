@@ -6,7 +6,8 @@ namespace E_cart.Models
     public class User
     {
         [Key]
-        public Guid Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         [Required]
         public string? Username { get; set; }
@@ -30,6 +31,8 @@ namespace E_cart.Models
         [Required]
         public decimal Number { get; set; } =0;
 
-        public List<Cart>Carts { get; set; }
+        public List<Cart> Carts { get; set; }
+        public List<Order> Orders { get; set; } 
+        public List<WishList> WishList { get; set; }
     }
 }

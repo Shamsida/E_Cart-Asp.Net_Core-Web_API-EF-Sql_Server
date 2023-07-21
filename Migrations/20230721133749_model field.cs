@@ -5,7 +5,7 @@
 namespace E_cart.Migrations
 {
     /// <inheritdoc />
-    public partial class orderupdates : Migration
+    public partial class modelfield : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

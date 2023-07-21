@@ -86,3 +86,9 @@ C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\runtimes\win\lib\netst
 C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
 C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\AutoMapper.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

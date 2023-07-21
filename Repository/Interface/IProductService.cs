@@ -1,4 +1,5 @@
 ﻿using E_cart.Models;
+using E_cart.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_cart.Repository.Interface
@@ -6,8 +7,8 @@ namespace E_cart.Repository.Interface
     public interface IProductService
     {
         Task<IEnumerable<Product>> Get();
-        Task<Product> Get(int id);
-        Task<Product> Post(Product item);
+        Task<Product> GetById(int id);
+        Task <Product> Post(CreateProductDTO item);
         Task<Product> Put(int Id, Product item);
         Task<bool> Delete(int Id);
     }
