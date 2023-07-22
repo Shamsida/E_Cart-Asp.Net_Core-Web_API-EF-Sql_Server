@@ -1,5 +1,5 @@
 ﻿using E_cart.Models;
-using E_cart.Models.DTO;
+using E_cart.DTO;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -58,5 +58,17 @@ namespace E_cart.Controllers
             }
             return CreatedAtAction(nameof(GetById), new {id = itm.Id},itm);
         }
+
+        [HttpPut("PutItems")]
+        public async Task<IActionResult> Put(int Id, UpdateProductDTO item)
+        {
+            var itm = await productService.Put(Id, item);
+            if (itm == null)
+            {
+                return BadRequest("Inavlid Credential");
+            }
+            return Ok(itm);
+        }
+
     }
 }

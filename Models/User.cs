@@ -31,8 +31,8 @@ namespace E_cart.Models
         [Required]
         public decimal Number { get; set; } =0;
 
-        public List<Cart> Carts { get; set; }
-        public List<Order> Orders { get; set; } 
-        public List<WishList> WishList { get; set; }
+        public virtual List<Cart> Carts { get; set; }
+        public virtual List<Order> Orders { get; set; } 
+        public virtual List<WishList> WishList { get; set; }
     }
 }

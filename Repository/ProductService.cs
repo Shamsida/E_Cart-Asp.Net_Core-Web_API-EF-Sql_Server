@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using E_cart.Data;
 using E_cart.Models;
-using E_cart.Models.DTO;
+using E_cart.DTO;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,21 +11,22 @@ namespace E_cart.Repository
     public class ProductService : IProductService
     {
         private readonly DataContext _dataContext;
-        private readonly IMapper mapper;
+        private readonly IMapper _mapper;
         public ProductService(DataContext dataContext,IMapper mapper)
         {
             _dataContext = dataContext;
-            mapper = mapper;
+            _mapper = mapper;
             
         }
 
 
-        public async Task<IEnumerable<Product>> Get()
+        public async Task<IEnumerable<ProductDTO>> Get()
         {
             try
             {
                 var items = await _dataContext.Products.Include(e=>e.Category).ToListAsync();
-                return items;
+                var prodDto = _mapper.Map<List<ProductDTO>>(items);
+                return prodDto;
             }
             catch (Exception ex)
             {
@@ -60,6 +61,7 @@ namespace E_cart.Repository
                     throw new Exception("Invalid entry");
                 }
                 var category = await _dataContext.Categories.FindAsync(item.CategoryId);
+
                 if (category == null)
                 {
                     throw new Exception("Invalid category ID.");
@@ -87,9 +89,39 @@ namespace E_cart.Repository
             }
         }
 
-        public Task<Product> Put(int Id, Product item)
+        public async Task<Product> Put(int Id, UpdateProductDTO item)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (item == null)
+                {
+                    throw new Exception("Invalid entry");
+                }
+                var itm = _dataContext.Products.FirstOrDefault(x => x.Id == Id);
+                if (itm == null)
+                {
+                    throw new Exception("Not Found");
+                }
+                itm.Title = item.Title;
+                itm.Price = item.Price;
+                itm.CategoryId = item.CategoryId;
+
+                var category = await _dataContext.Categories.FindAsync(item.CategoryId);
+
+                if (category == null)
+                {
+                    throw new Exception("Invalid category ID.");
+                }
+                itm.Category = category;
+                await _dataContext.SaveChangesAsync();
+                return itm;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return null;
+            }
         }
 
         public Task<bool> Delete(int Id)
