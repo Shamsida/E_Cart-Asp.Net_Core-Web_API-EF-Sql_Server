@@ -8,6 +8,7 @@ namespace E_cart.Repository.Interface
     {
         Task<IEnumerable<ProductDTO>> Get();
         Task<Product> GetById(int id);
+        Task<IEnumerable<ProductDTO>> GetProductsByCategory(int categoryId);
         Task <Product> Post(CreateProductDTO item);
         Task<Product> Put(int Id, UpdateProductDTO item);
         Task<bool> Delete(int Id);

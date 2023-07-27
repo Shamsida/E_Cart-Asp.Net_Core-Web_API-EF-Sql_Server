@@ -24,6 +24,7 @@ namespace E_cart
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(Program));
             builder.Services.AddScoped<IProductService , ProductService>();
+            builder.Services.AddScoped<IUserService , UserService>();
 
             var app = builder.Build();
 

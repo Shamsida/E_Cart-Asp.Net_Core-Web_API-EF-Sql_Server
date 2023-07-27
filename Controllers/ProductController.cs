@@ -48,6 +48,18 @@ namespace E_cart.Controllers
             return Ok(itm);
         }
 
+        [HttpGet("GetProductsByCategory")]
+        public async Task<IActionResult> GetProductsByCategory(int categoryId)
+        {
+            var itm = await productService.GetProductsByCategory(categoryId);
+            if (itm == null)
+            {
+                return NotFound();
+            }
+            return Ok(itm);
+        }
+
+
         [HttpPost("PostItems")]
         public async Task<IActionResult> Post(CreateProductDTO item)
         {
@@ -68,6 +80,24 @@ namespace E_cart.Controllers
                 return BadRequest("Inavlid Credential");
             }
             return Ok(itm);
+        }
+
+        [HttpDelete("DeleteItems")]
+        public async Task<IActionResult> Delete(int Id)
+        {
+            try
+            {
+                var itm = await productService.Delete(Id);
+                if (!itm)
+                {
+                    return BadRequest("Error");
+                }
+                return Ok("Removed Successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

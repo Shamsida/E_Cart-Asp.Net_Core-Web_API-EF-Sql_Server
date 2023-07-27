@@ -11,6 +11,7 @@ namespace E_cart.Mapper
             CreateMap<Product,CreateProductDTO>().ReverseMap();
             CreateMap<Product,UpdateProductDTO>().ReverseMap();
             CreateMap<Product,ProductDTO>().ReverseMap();
+            CreateMap<User,UserDTO>().ReverseMap();
 
         }
     }

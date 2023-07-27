@@ -13,7 +13,7 @@ namespace E_cart.Models
         public int CartId { get; set; }
 
         [Required]
-        public Guid ProductId { get; set; }
+        public int ProductId { get; set; }
 
         [Required]
         public int Quantity { get; set; }

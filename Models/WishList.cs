@@ -13,7 +13,7 @@ namespace E_cart.Models
         public User User { get; set; }
 
         [Required]
-        public Guid ProductId { get; set; }
+        public int ProductId { get; set; }
 
         public virtual Product Product { get; set; }
     }

@@ -10,7 +10,7 @@ namespace E_cart.Models
         public int Id { get; set; }
 
         [Required]
-        public virtual User User { get; set; }
+        public User User { get; set; }
 
         public ICollection<CartDetail>? CartDetails { get; set; }
     }

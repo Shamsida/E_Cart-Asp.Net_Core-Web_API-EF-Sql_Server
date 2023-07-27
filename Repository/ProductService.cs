@@ -16,7 +16,6 @@ namespace E_cart.Repository
         {
             _dataContext = dataContext;
             _mapper = mapper;
-            
         }
 
 
@@ -24,7 +23,10 @@ namespace E_cart.Repository
         {
             try
             {
-                var items = await _dataContext.Products.Include(e=>e.Category).ToListAsync();
+                var items = await _dataContext.Products
+                           .Include(e=>e.Category)
+                           .ToListAsync();
+
                 var prodDto = _mapper.Map<List<ProductDTO>>(items);
                 return prodDto;
             }
@@ -38,7 +40,11 @@ namespace E_cart.Repository
         {
             try
             {
-                var items = await _dataContext.Products.Include(e => e.Category).Where(e => e.Id == id).FirstOrDefaultAsync();
+                var items = await _dataContext.Products
+                            .Include(e => e.Category)
+                            .Where(e => e.Id == id)
+                            .FirstOrDefaultAsync();
+
                 if (items == null)
                 {
                     throw new Exception("Invalid entry");
@@ -48,6 +54,29 @@ namespace E_cart.Repository
             catch (Exception ex)
             {
                 throw;
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<ProductDTO>> GetProductsByCategory(int categoryId)
+        {
+            try
+            {
+                var products = await _dataContext.Products
+                               .Include(p => p.Category)
+                               .Where(p => p.CategoryId == categoryId)
+                               .ToListAsync();
+
+                if (products == null || products.Count == 0)
+                {
+                    throw new Exception("Invalid entry");
+                }
+                var prodDto = _mapper.Map<List<ProductDTO>>(products);
+                return prodDto;
+
+            }
+            catch (Exception ex)
+            {
                 return null;
             }
         }
@@ -124,9 +153,24 @@ namespace E_cart.Repository
             }
         }
 
-        public Task<bool> Delete(int Id)
+        public async Task<bool> Delete(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var itm = _dataContext.Products.FirstOrDefault(x => x.Id == Id);
+                if (itm == null)
+                {
+                    throw new Exception("Not Found");
+                }
+                _dataContext.Products.Remove(itm);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return false;
+            }
         }
     }
 }
