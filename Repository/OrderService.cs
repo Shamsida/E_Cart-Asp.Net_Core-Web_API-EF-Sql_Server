@@ -37,5 +37,27 @@ namespace E_cart.Repository
                 return null;
             }
         }
+
+        public async Task<IEnumerable<Order>> GetOrders()
+        {
+            try
+            {
+                var orders = await _dataContext.Orders
+                            .Include(x => x.OrderDetail)
+                            .ThenInclude(x => x.Product)
+                            .ToListAsync();
+
+                if (orders.Count == 0)
+                {
+                    throw new Exception("No data found");
+                }
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return null;
+            }
+        }
     }
 }

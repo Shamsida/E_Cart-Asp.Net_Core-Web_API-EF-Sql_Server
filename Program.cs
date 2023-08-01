@@ -20,6 +20,7 @@ namespace E_cart
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
+
             builder.Services.AddControllers();
             builder.Services.AddAuthentication(x =>
             {
@@ -51,6 +52,19 @@ namespace E_cart
             builder.Services.AddScoped<ICartService , CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IWishlistService , WishlistService>();
+
+            var provider = builder.Services.BuildServiceProvider();
+            var configuration = provider.GetRequiredService<IConfiguration>();
+
+            builder.Services.AddCors(options =>
+            {
+                var frontendURL = configuration.GetValue<string>("frontend_url");
+
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
             var app = builder.Build();
 
