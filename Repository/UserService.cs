@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using E_cart.Data;
-using E_cart.DTO;
+using E_cart.DTO.UserDto;
 using E_cart.Models;
 using E_cart.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace E_cart.Repository
 {
@@ -11,12 +15,12 @@ namespace E_cart.Repository
     {
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
-        //private string secretkey;
+        private string secretkey;
 
-        public UserService(DataContext dataContext, IMapper mapper)
+        public UserService(DataContext dataContext, IConfiguration configuration, IMapper mapper)
         {
             _dataContext = dataContext;
-           // this.secretkey = configuration.GetValue<string>("Jwt:Key");
+            this.secretkey = configuration.GetValue<string>("Jwt:Key");
             _mapper = mapper;
         }
 
@@ -27,6 +31,7 @@ namespace E_cart.Repository
                 var items = await _dataContext.Users
                             .Include(u => u.Carts)
                             .ThenInclude(c => c.CartDetails)
+                            .Where(x => x.Role == "user")
                             .ToListAsync();
 
                 var usrDtos = items.Select(u => new UserDTO
@@ -36,6 +41,7 @@ namespace E_cart.Repository
                     Firstname = u.Firstname,
                     Lastname = u.Lastname,
                     Email = u.Email,
+                    Role = u.Role,
                     Number = u.Number,
                     Carts = u.Carts.Select(c => new CartDTO
                     {
@@ -68,6 +74,7 @@ namespace E_cart.Repository
                 var items = await _dataContext.Users
                             .Include(u => u.Carts)
                             .ThenInclude(c => c.CartDetails)
+                            .Where(x => x.Role == "user")
                             .FirstOrDefaultAsync(u => u.Id == id);
 
                 if (items == null)
@@ -82,6 +89,7 @@ namespace E_cart.Repository
                     Firstname = items.Firstname,
                     Lastname = items.Lastname,
                     Email = items.Email,
+                    Role = items.Role,
                     Number = items.Number,
                     Carts = items.Carts.Select(c => new CartDTO
                     {
@@ -107,19 +115,128 @@ namespace E_cart.Repository
             }
         }
 
-        public Task<LoginResDTO> Login(LoginReqDTO loginReq)
+        public async Task<LoginResDTO> Login(LoginReqDTO loginReq)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (loginReq == null)
+                {
+                    throw new Exception("Invalid Enrty");
+                };
+                var usr = await _dataContext.Users
+                          .SingleOrDefaultAsync(e => e.Email.ToLower() == loginReq.Email.ToLower() && e.Role == "user");
+
+                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(usr.Password, loginReq.Password);
+
+                if (usr == null || !isPasswordValid)
+                {
+                    throw new Exception("Invalid user name or password");
+                }
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = Encoding.ASCII.GetBytes(secretkey);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Email, usr.Email),
+                    new Claim(ClaimTypes.Role,usr.Role)
+                    }),
+
+                    Expires = DateTime.UtcNow.AddDays(1),
+                    SigningCredentials = new(new SymmetricSecurityKey(token), SecurityAlgorithms.HmacSha256)
+                };
+                var jwttoken = tokenHandler.CreateToken(tokenDescriptor);
+                LoginResDTO loginResDTO = new LoginResDTO()
+                {
+                    user = usr,
+                    Token = tokenHandler.WriteToken(jwttoken)
+
+                };
+                return loginResDTO;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
-        public Task<LoginResDTO> AdminLogin(LoginReqDTO loginReq)
+        public async Task<LoginResDTO> AdminLogin(LoginReqDTO loginReq)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (loginReq == null)
+                {
+                    throw new Exception("Invalid Enrty");
+                };
+                var admn = await _dataContext.Users
+                          .SingleOrDefaultAsync(e => e.Email.ToLower() == loginReq.Email.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
+
+                if (admn == null)
+                {
+                    throw new Exception("Invalid user name or password");
+                }
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = Encoding.ASCII.GetBytes(secretkey);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Email, admn.Email),
+                    new Claim(ClaimTypes.Role,admn.Role)
+                    }),
+
+                    Expires = DateTime.UtcNow.AddDays(1),
+                    SigningCredentials = new(new SymmetricSecurityKey(token), SecurityAlgorithms.HmacSha256)
+                };
+                var jwttoken = tokenHandler.CreateToken(tokenDescriptor);
+                LoginResDTO loginResDTO = new LoginResDTO()
+                {
+                    user = admn,
+                    Token = tokenHandler.WriteToken(jwttoken)
+
+                };
+                return loginResDTO;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
-        public Task<UserDTO> SignUP(User employee)
+        public async Task<UserDataDTO> SignUP(CreateUserDTO usr)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (usr == null)
+                {
+                    throw new Exception("Invalid entry");
+                }
+                var user = new User
+                {
+                    Username = usr.Username,
+                    Firstname = usr.Firstname,
+                    Lastname = usr.Lastname,
+                    Email = usr.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(usr.Password, 10),
+                    Imageurl = usr.Imageurl,
+                    Number = usr.Number,
+                    Role = "user"
+                };
+
+                _dataContext.Users.Add(user);
+                await _dataContext.SaveChangesAsync();
+                var usrDto = _mapper.Map<UserDataDTO>(user);
+                return usrDto;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

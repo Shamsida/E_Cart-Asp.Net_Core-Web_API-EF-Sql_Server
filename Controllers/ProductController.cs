@@ -1,5 +1,5 @@
 ﻿using E_cart.Models;
-using E_cart.DTO;
+using E_cart.DTO.ProductDto;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

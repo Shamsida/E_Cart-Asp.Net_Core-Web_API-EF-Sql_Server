@@ -12,6 +12,6 @@ namespace E_cart.Models
         [Required]
         public User User { get; set; }
 
-        public ICollection<CartDetail>? CartDetails { get; set; }
+        public ICollection<CartDetail>? CartDetails { get; set; } = new List<CartDetail>();
     }
 }

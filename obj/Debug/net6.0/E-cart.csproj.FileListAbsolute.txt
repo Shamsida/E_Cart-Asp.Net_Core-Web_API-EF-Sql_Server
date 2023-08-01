@@ -92,3 +92,4 @@ C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
 C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\AutoMapper.dll
 C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\User\source\repos\E-cart\E-cart\bin\Debug\net6.0\BCrypt.Net-Next.dll
