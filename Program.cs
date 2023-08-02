@@ -53,16 +53,13 @@ namespace E_cart
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IWishlistService , WishlistService>();
 
-            var provider = builder.Services.BuildServiceProvider();
-            var configuration = provider.GetRequiredService<IConfiguration>();
-
             builder.Services.AddCors(options =>
             {
-                var frontendURL = configuration.GetValue<string>("frontend_url");
-
                 options.AddDefaultPolicy(builder =>
                 {
-                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    builder.AllowAnyOrigin() 
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
                 });
             });
 
@@ -76,6 +73,10 @@ namespace E_cart
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors();
+
+            app.UseAuthorization();
 
             app.UseAuthorization();
 
