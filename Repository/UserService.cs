@@ -5,6 +5,7 @@ using E_cart.Models;
 using E_cart.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.SqlServer.Server;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,13 +16,17 @@ namespace E_cart.Repository
     {
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
-        private string secretkey;
+        private readonly IWebHostEnvironment environment;
+        private readonly SaveImage saveImage;
+        private readonly string secretkey;
 
-        public UserService(DataContext dataContext, IConfiguration configuration, IMapper mapper)
+        public UserService(DataContext dataContext, IConfiguration configuration, IMapper mapper, IWebHostEnvironment env, SaveImage saveImage)
         {
             _dataContext = dataContext;
             this.secretkey = configuration.GetValue<string>("Jwt:Key");
             _mapper = mapper;
+            this.environment = env;
+            this.saveImage = saveImage;
         }
 
         public async Task<IEnumerable<UserDTO>> Get()
@@ -42,6 +47,7 @@ namespace E_cart.Repository
                     Lastname = u.Lastname,
                     Email = u.Email,
                     Role = u.Role,
+                    Imageurl = u.Imageurl,
                     Number = u.Number,
                     Carts = u.Carts.Select(c => new CartDTO
                     {
@@ -90,6 +96,7 @@ namespace E_cart.Repository
                     Lastname = items.Lastname,
                     Email = items.Email,
                     Role = items.Role,
+                    Imageurl = items.Imageurl,
                     Number = items.Number,
                     Carts = items.Carts.Select(c => new CartDTO
                     {
@@ -215,6 +222,16 @@ namespace E_cart.Repository
                 {
                     throw new Exception("Invalid entry");
                 }
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + usr.Imageurl.FileName;
+
+                // Combine the path to the "images" folder with the unique filename
+                string imagePath = Path.Combine(environment.WebRootPath, "images", uniqueFileName);
+
+                // Save the image to the "images" folder
+                using (var fileStream = new FileStream(imagePath, FileMode.Create))
+                {
+                    usr.Imageurl.CopyTo(fileStream);
+                }
                 var user = new User
                 {
                     Username = usr.Username,
@@ -222,7 +239,8 @@ namespace E_cart.Repository
                     Lastname = usr.Lastname,
                     Email = usr.Email,
                     Password = BCrypt.Net.BCrypt.HashPassword(usr.Password, 10),
-                    Imageurl = usr.Imageurl,
+                    //Imageurl = await saveImage.SaveImages(usr.Imageurl, "image"),
+                    Imageurl = "/images/" + uniqueFileName,
                     Number = usr.Number,
                     Role = "user"
                 };

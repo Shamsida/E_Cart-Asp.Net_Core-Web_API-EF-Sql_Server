@@ -6,7 +6,7 @@ namespace E_cart.DTO.ProductDto
 {
     public class UpdateProductDTO
     {
-        public int CategoryId { get; set; }
+        public string? CategoryName { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string? Title { get; set; }

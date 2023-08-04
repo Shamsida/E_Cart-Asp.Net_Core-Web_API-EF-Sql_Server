@@ -3,6 +3,7 @@ using E_cart.Repository;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -52,6 +53,7 @@ namespace E_cart
             builder.Services.AddScoped<ICartService , CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IWishlistService , WishlistService>();
+            builder.Services.AddScoped<SaveImage>();
 
             builder.Services.AddCors(options =>
             {
@@ -71,6 +73,12 @@ namespace E_cart
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "Images")),
+                RequestPath = "/Image"
+            });
 
             app.UseHttpsRedirection();
 

@@ -89,16 +89,17 @@ namespace E_cart.Repository
                 {
                     throw new Exception("Invalid entry");
                 }
-                var category = await _dataContext.Categories.FindAsync(item.CategoryId);
-
+                var category = await _dataContext.Categories.FirstOrDefaultAsync(c => c.CategoryName == item.CategoryName);
                 if (category == null)
                 {
-                    throw new Exception("Invalid category ID.");
+                    category = new Category { CategoryName = item.CategoryName };
+                    _dataContext.Categories.Add(category);
+                    await _dataContext.SaveChangesAsync();
                 }
 
                 Product pro = new Product()
                 {
-                    CategoryId = item.CategoryId,
+                    CategoryId = category.CategoryId,
                     Title = item.Title,
                     Description = item.Description,
                     Image = item.Image,
@@ -131,16 +132,17 @@ namespace E_cart.Repository
                 {
                     throw new Exception("Not Found");
                 }
-                itm.Title = item.Title;
-                itm.Price = item.Price;
-                itm.CategoryId = item.CategoryId;
-
-                var category = await _dataContext.Categories.FindAsync(item.CategoryId);
-
+                var category = await _dataContext.Categories.FirstOrDefaultAsync(c => c.CategoryName == item.CategoryName);
                 if (category == null)
                 {
-                    throw new Exception("Invalid category ID.");
+                    category = new Category { CategoryName = item.CategoryName };
+                    _dataContext.Categories.Add(category);
+                    await _dataContext.SaveChangesAsync();
                 }
+
+                itm.Title = item.Title;
+                itm.Price = item.Price;
+                itm.CategoryId = category.CategoryId;
                 itm.Category = category;
                 await _dataContext.SaveChangesAsync();
                 return itm;

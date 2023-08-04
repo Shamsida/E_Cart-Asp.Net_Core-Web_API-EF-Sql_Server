@@ -18,6 +18,8 @@ namespace E_cart.DTO.UserDto
 
         public string? Role { get; set; }
 
+        public string? Imageurl { get; set; }
+
         public decimal Number { get; set; } = 0;
 
         public List<CartDTO> Carts { get; set; }

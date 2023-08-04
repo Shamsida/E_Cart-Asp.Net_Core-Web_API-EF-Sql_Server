@@ -6,7 +6,7 @@ namespace E_cart.DTO.ProductDto
 {
     public class CreateProductDTO
     {
-        public int CategoryId { get; set; }
+        public string? CategoryName { get; set; }
 
         [Required]
         [Column(TypeName = "nvarchar(100)")]
