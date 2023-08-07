@@ -49,9 +49,9 @@ namespace E_cart.Controllers
         }
 
         [HttpGet("GetProductsByCategory")]
-        public async Task<IActionResult> GetProductsByCategory(int categoryId)
+        public async Task<IActionResult> GetProductsByCategory(string categoryName)
         {
-            var itm = await productService.GetProductsByCategory(categoryId);
+            var itm = await productService.GetProductsByCategory(categoryName);
             if (itm == null)
             {
                 return NotFound();

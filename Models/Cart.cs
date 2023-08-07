@@ -9,6 +9,8 @@ namespace E_cart.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        public decimal TotalPrice { get; set; }
+
         [Required]
         public User User { get; set; }
 

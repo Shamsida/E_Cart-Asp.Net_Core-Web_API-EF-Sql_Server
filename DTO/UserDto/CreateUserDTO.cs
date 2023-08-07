@@ -27,7 +27,7 @@ namespace E_cart.DTO.UserDto
         [Required]
         public string Password { get; set; } = null!;
 
-        public IFormFile? Imageurl { get; set; } = null!;
+        public string? Imageurl { get; set; } = null!;
 
         [Required]
         public decimal Number { get; set; } = 0;

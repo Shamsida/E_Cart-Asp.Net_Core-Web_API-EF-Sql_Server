@@ -1,4 +1,6 @@
-﻿namespace E_cart.DTO.UserDto
+﻿using E_cart.DTO.ProductDto;
+
+namespace E_cart.DTO.UserDto
 {
     public class CartDetailDTO
     {
@@ -8,5 +10,6 @@
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Total { get; set; }
+        public ProductDTO Product { get; set; }
     }
 }

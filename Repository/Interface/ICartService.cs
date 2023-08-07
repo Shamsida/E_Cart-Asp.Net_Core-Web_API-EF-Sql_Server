@@ -9,10 +9,12 @@ namespace E_cart.Repository.Interface
     {
         Task<IEnumerable<CartDataDTO>> GetCart(int userId);
 
-        Task<Cart> AddToCart(int userId, [FromBody] int prodID, int qty);
+        Task<Cart> AddToCart(int userId, [FromBody] AddtoCartDTO itm);
 
-        Task<bool> RemoveFromCart(int userId, [FromBody] int prodID);
+        Task<bool> RemoveFromCart(int userId, int prodID);
 
         Task<bool> DoCheckout(int userId);
+
+        Task<bool> IncreaseQuantity(int cartDetailId);
     }
 }

@@ -122,6 +122,55 @@ namespace E_cart.Repository
             }
         }
 
+        public async Task<UserDTO> GetByUsername(string username)
+        {
+            try
+            {
+                var items = await _dataContext.Users
+                            .Include(u => u.Carts)
+                            .ThenInclude(c => c.CartDetails)
+                            .Where(x => x.Role == "user")
+                            .FirstOrDefaultAsync(u => u.Username == username);
+
+                if (items == null)
+                {
+                    throw new Exception("Invalid entry");
+                }
+
+                var usrDtos = new UserDTO
+                {
+                    UserId = items.Id,
+                    Username = items.Username,
+                    Firstname = items.Firstname,
+                    Lastname = items.Lastname,
+                    Email = items.Email,
+                    Role = items.Role,
+                    Imageurl = items.Imageurl,
+                    Number = items.Number,
+                    Carts = items.Carts.Select(c => new CartDTO
+                    {
+                        CartId = c.Id,
+                        CartDetails = c.CartDetails?.Select(cd => new CartDetailDTO
+                        {
+                            CartDetailId = cd.Id,
+                            CartId = cd.CartId,
+                            ProductId = cd.ProductId,
+                            Quantity = cd.Quantity,
+                            UnitPrice = cd.UnitPrice,
+                            Total = cd.Total
+                        }).ToList() ?? new List<CartDetailDTO>()
+                    }).ToList()
+                };
+
+                //var usrDto = _mapper.Map<List<UserDTO>>(items);
+                return usrDtos;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public async Task<LoginResDTO> Login(LoginReqDTO loginReq)
         {
             try
@@ -131,11 +180,11 @@ namespace E_cart.Repository
                     throw new Exception("Invalid Enrty");
                 };
                 var usr = await _dataContext.Users
-                          .SingleOrDefaultAsync(e => e.Email.ToLower() == loginReq.Email.ToLower() && e.Role == "user");
+                          .SingleOrDefaultAsync(e => e.Username.ToLower() == loginReq.Username.ToLower() && e.Role == "user");
 
-                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(usr.Password, loginReq.Password);
+                //bool isPasswordValid = BCrypt.Net.BCrypt.Verify(usr.Password, loginReq.Password);
 
-                if (usr == null || !isPasswordValid)
+                if (usr == null || !BCrypt.Net.BCrypt.Verify(loginReq.Password, usr.Password))
                 {
                     throw new Exception("Invalid user name or password");
                 }
@@ -147,7 +196,7 @@ namespace E_cart.Repository
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                    new Claim(ClaimTypes.Email, usr.Email),
+                    new Claim(ClaimTypes.Name, usr.Username),
                     new Claim(ClaimTypes.Role,usr.Role)
                     }),
 
@@ -178,7 +227,7 @@ namespace E_cart.Repository
                     throw new Exception("Invalid Enrty");
                 };
                 var admn = await _dataContext.Users
-                          .SingleOrDefaultAsync(e => e.Email.ToLower() == loginReq.Email.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
+                          .SingleOrDefaultAsync(e => e.Email.ToLower() == loginReq.Username.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
 
                 if (admn == null)
                 {
@@ -192,7 +241,7 @@ namespace E_cart.Repository
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                    new Claim(ClaimTypes.Email, admn.Email),
+                    new Claim(ClaimTypes.Name, admn.Username),
                     new Claim(ClaimTypes.Role,admn.Role)
                     }),
 
@@ -222,16 +271,16 @@ namespace E_cart.Repository
                 {
                     throw new Exception("Invalid entry");
                 }
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + usr.Imageurl.FileName;
+               // string uniqueFileName = Guid.NewGuid().ToString() + "_" + usr.Imageurl.FileName;
 
                 // Combine the path to the "images" folder with the unique filename
-                string imagePath = Path.Combine(environment.WebRootPath, "images", uniqueFileName);
+               // string imagePath = Path.Combine(environment.WebRootPath, "images", uniqueFileName);
 
                 // Save the image to the "images" folder
-                using (var fileStream = new FileStream(imagePath, FileMode.Create))
-                {
-                    usr.Imageurl.CopyTo(fileStream);
-                }
+               // using (var fileStream = new FileStream(imagePath, FileMode.Create))
+               // {
+                //    usr.Imageurl.CopyTo(fileStream);
+                //}
                 var user = new User
                 {
                     Username = usr.Username,
@@ -239,8 +288,9 @@ namespace E_cart.Repository
                     Lastname = usr.Lastname,
                     Email = usr.Email,
                     Password = BCrypt.Net.BCrypt.HashPassword(usr.Password, 10),
+                    Imageurl = usr.Imageurl,
                     //Imageurl = await saveImage.SaveImages(usr.Imageurl, "image"),
-                    Imageurl = "/images/" + uniqueFileName,
+                    //Imageurl = "/images/" + uniqueFileName,
                     Number = usr.Number,
                     Role = "user"
                 };

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using E_cart.Data;
 using E_cart.DTO.CartDto;
+using E_cart.DTO.ProductDto;
 using E_cart.DTO.UserDto;
 using E_cart.Models;
 using E_cart.Repository.Interface;
@@ -43,16 +44,17 @@ namespace E_cart.Repository
                 var cartDataDTOList = cart.Select(c => new CartDataDTO
                 {
                     CartId = c.Id,
-                    User = new UserDataDTO
-                    {
-                        UserId = c.User.Id,
-                        Username = c.User.Username,
-                        Firstname = c.User.Firstname,
-                        Lastname = c.User.Lastname,
-                        Email = c.User.Email,
-                        Role = c.User.Role,
-                        Number = c.User.Number
-                    },
+                    TotalPrice = c.TotalPrice,
+                    //User = new UserDataDTO
+                    //{
+                    //    UserId = c.User.Id,
+                    //    Username = c.User.Username,
+                    //    Firstname = c.User.Firstname,
+                    //    Lastname = c.User.Lastname,
+                    //    Email = c.User.Email,
+                    //    Role = c.User.Role,
+                    //    Number = c.User.Number
+                    //},
                     CartDetails = c.CartDetails.Select(cd => new CartDetailDTO
                     {
                         CartDetailId = cd.Id,
@@ -60,7 +62,16 @@ namespace E_cart.Repository
                         ProductId = cd.ProductId,
                         Quantity = cd.Quantity,
                         UnitPrice = cd.UnitPrice,
-                        Total = cd.Total
+                        Total = cd.Total,
+                        Product = new ProductDTO 
+                        {
+                            Id = cd.Product.Id,
+                            CategoryId = cd.Product.CategoryId,
+                            Title = cd.Product.Title,
+                            Description = cd.Product.Description,
+                            Price = cd.Product.Price,
+                            Image = cd.Product.Image
+                        }
                     }).ToList()
                 });
 
@@ -73,7 +84,7 @@ namespace E_cart.Repository
             }
         }
 
-        public async Task<Cart> AddToCart(int userId, [FromBody] int prodID, int qty)
+        public async Task<Cart> AddToCart(int userId, [FromBody] AddtoCartDTO itm)
         {
             try
             {
@@ -97,9 +108,9 @@ namespace E_cart.Repository
 
 
                 var cartItem = await _dataContext.CartDetails
-                            .FirstOrDefaultAsync(a => a.CartId == cart.Id && a.ProductId == prodID);
+                            .FirstOrDefaultAsync(a => a.CartId == cart.Id && a.ProductId == itm.ProdID);
 
-                var product = await _dataContext.Products.FirstOrDefaultAsync(a => a.Id == prodID);
+                var product = await _dataContext.Products.FirstOrDefaultAsync(a => a.Id == itm.ProdID);
 
                 if (product == null)
                 {
@@ -112,10 +123,10 @@ namespace E_cart.Repository
                     var cartDetailEntity = new CartDetail
                     {
                         CartId = cart.Id,
-                        ProductId = prodID,
-                        Quantity = qty,
+                        ProductId = itm.ProdID,
+                        Quantity = itm.Qty,
                         UnitPrice = product.Price,
-                        Total = qty * product.Price
+                        Total = itm.Qty * product.Price
                     };
                     if (cart.CartDetails == null)
                     {
@@ -123,14 +134,18 @@ namespace E_cart.Repository
                     }
 
                     cart.CartDetails.Add(cartDetailEntity);
-                    _dataContext.SaveChanges();
+                    await _dataContext.SaveChangesAsync();
                 }
                 else
                 {
-                    cartItem.Quantity += qty;
-                    cartItem.Total += qty * product.Price;
-                    _dataContext.SaveChanges();
+                    cartItem.Quantity += itm.Qty;
+                    cartItem.Total += itm.Qty * product.Price;
+                    await _dataContext.SaveChangesAsync();
                 }
+
+                cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
+                _dataContext.SaveChanges();
+
                 return cart;
             }
             catch (Exception ex)
@@ -139,7 +154,7 @@ namespace E_cart.Repository
             }
         }
 
-        public async Task<bool> RemoveFromCart(int userId, [FromBody] int prodID)
+        public async Task<bool> RemoveFromCart(int userId, int prodID)
         {
             try
             {
@@ -165,10 +180,11 @@ namespace E_cart.Repository
                 if (cartDetail == null)
                 {
                     throw new Exception("Item Not Found.");
-                } else if (cartDetail.Quantity == 1)
+                } 
+                else if (cartDetail.Quantity == 1)
                 {
                     _dataContext.CartDetails.Remove(cartDetail);
-                    _dataContext.SaveChanges();
+                    await _dataContext.SaveChangesAsync();
                 }
                 else
                 {
@@ -176,6 +192,10 @@ namespace E_cart.Repository
                     cartDetail.Total = cartDetail.Total - product.Price;
                     _dataContext.SaveChanges();
                 }
+
+                cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
+                await _dataContext.SaveChangesAsync();
+
                 return true;
             }
             catch (Exception ex)
@@ -233,7 +253,7 @@ namespace E_cart.Repository
                         };
 
                         order.OrderDetail.Add(orderDetail);
-                        _dataContext.SaveChanges();
+                        await _dataContext.SaveChangesAsync();
                     }
                     _dataContext.Orders.Add(order);
                     await _dataContext.SaveChangesAsync();
@@ -284,6 +304,41 @@ namespace E_cart.Repository
                 return false;
             }
 
+        }
+
+        public async Task<bool> IncreaseQuantity(int cartDetailId)
+        {
+            try
+            {
+                var cartDetail = await _dataContext.CartDetails
+                    .Include(cd => cd.Cart)
+                    .FirstOrDefaultAsync(cd => cd.Id == cartDetailId);
+
+                if (cartDetail == null)
+                {
+                    throw new Exception("Cart detail not found.");
+                }
+
+                var product = await _dataContext.Products.FirstOrDefaultAsync(p => p.Id == cartDetail.ProductId);
+                if (product == null)
+                {
+                    throw new Exception("Product not found.");
+                }
+
+                cartDetail.Quantity++;
+                cartDetail.Total = cartDetail.Quantity * cartDetail.UnitPrice;
+
+                cartDetail.Cart.TotalPrice = cartDetail.Cart.CartDetails.Sum(cd => cd.Total);
+
+                await _dataContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return false;
+            }
         }
     }
 }

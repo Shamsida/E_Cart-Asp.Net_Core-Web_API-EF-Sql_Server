@@ -58,20 +58,18 @@ namespace E_cart.Repository
             }
         }
 
-        public async Task<IEnumerable<ProductDTO>> GetProductsByCategory(int categoryId)
+        public async Task<IEnumerable<ProductDTO>> GetProductsByCategory(string categoryName)
         {
             try
             {
-                var products = await _dataContext.Products
-                               .Include(p => p.Category)
-                               .Where(p => p.CategoryId == categoryId)
-                               .ToListAsync();
+                var productsWithCategory = await _dataContext.Products
+                                .Where(p => p.Category.CategoryName == categoryName).ToListAsync();
 
-                if (products == null || products.Count == 0)
+                if (productsWithCategory.Count == 0)
                 {
                     throw new Exception("Invalid entry");
                 }
-                var prodDto = _mapper.Map<List<ProductDTO>>(products);
+                var prodDto = _mapper.Map<List<ProductDTO>>(productsWithCategory);
                 return prodDto;
 
             }
@@ -130,20 +128,27 @@ namespace E_cart.Repository
                 var itm = await _dataContext.Products.FirstOrDefaultAsync(x => x.Id == Id);
                 if (itm == null)
                 {
-                    throw new Exception("Not Found");
-                }
-                var category = await _dataContext.Categories.FirstOrDefaultAsync(c => c.CategoryName == item.CategoryName);
-                if (category == null)
-                {
-                    category = new Category { CategoryName = item.CategoryName };
-                    _dataContext.Categories.Add(category);
-                    await _dataContext.SaveChangesAsync();
+                    throw new Exception("Product Not Found");
                 }
 
                 itm.Title = item.Title;
                 itm.Price = item.Price;
-                itm.CategoryId = category.CategoryId;
-                itm.Category = category;
+                itm.Image = item.Image;
+
+                if (!string.IsNullOrEmpty(item.CategoryName))
+                {
+                    var category = await _dataContext.Categories
+                                .FirstOrDefaultAsync(c => c.CategoryName == item.CategoryName);
+                    if (category == null)
+                    {
+                        category = new Category { CategoryName = item.CategoryName };
+                        _dataContext.Categories.Add(category);
+                        await _dataContext.SaveChangesAsync();
+                    }
+                    itm.CategoryId = category.CategoryId;
+                    itm.Category = category;
+                }
+                
                 await _dataContext.SaveChangesAsync();
                 return itm;
 

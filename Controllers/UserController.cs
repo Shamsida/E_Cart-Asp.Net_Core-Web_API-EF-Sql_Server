@@ -40,6 +40,17 @@ namespace E_cart.Controllers
             return Ok(itm);
         }
 
+        [HttpGet("api/user/GetUsersByUsername")]
+        public async Task<IActionResult> GetByUsername(string username)
+        {
+            var itm = await userService.GetByUsername(username);
+            if (itm == null)
+            {
+                return NotFound();
+            }
+            return Ok(itm);
+        }
+
         [HttpPost("api/user/Signup")]
         public async Task<IActionResult> SignUp(CreateUserDTO usr)
         {

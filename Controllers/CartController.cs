@@ -1,4 +1,5 @@
-﻿using E_cart.DTO.UserDto;
+﻿using E_cart.DTO.CartDto;
+using E_cart.DTO.UserDto;
 using E_cart.Models;
 using E_cart.Repository;
 using E_cart.Repository.Interface;
@@ -30,9 +31,9 @@ namespace E_cart.Controllers
         }
 
         [HttpPost("AddToCart")]
-        public async Task<IActionResult> AddToCart(int userId, [FromBody] int prodID, int qty)
+        public async Task<IActionResult> AddToCart(int userId, [FromBody] AddtoCartDTO itm)
         {
-            var user = await cartService.AddToCart(userId, prodID, qty);
+            var user = await cartService.AddToCart(userId, itm);
             if (user == null)
             {
                 return BadRequest();
@@ -41,7 +42,7 @@ namespace E_cart.Controllers
         }
 
         [HttpDelete("DeleteCartItems")]
-        public async Task<IActionResult> Delete(int userId, [FromBody] int prodID)
+        public async Task<IActionResult> Delete(int userId, int prodID)
         {
             try
             {
@@ -73,6 +74,16 @@ namespace E_cart.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPut("IncreaseQuantity")]
+        public async Task<IActionResult> IncreaseQuantity(int cartDetailId)
+        {
+            var user = await cartService.IncreaseQuantity(cartDetailId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            return Ok(user);
         }
     }
 }
