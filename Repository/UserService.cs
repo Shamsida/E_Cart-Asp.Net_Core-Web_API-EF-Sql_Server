@@ -3,6 +3,7 @@ using E_cart.Data;
 using E_cart.DTO.UserDto;
 using E_cart.Models;
 using E_cart.Repository.Interface;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SqlServer.Server;
@@ -16,8 +17,8 @@ namespace E_cart.Repository
     {
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
-        private readonly IWebHostEnvironment environment;
-        private readonly SaveImage saveImage;
+        private readonly IWebHostEnvironment _environment;
+        private readonly SaveImage _saveImage;
         private readonly string secretkey;
 
         public UserService(DataContext dataContext, IConfiguration configuration, IMapper mapper, IWebHostEnvironment env, SaveImage saveImage)
@@ -25,8 +26,8 @@ namespace E_cart.Repository
             _dataContext = dataContext;
             this.secretkey = configuration.GetValue<string>("Jwt:Key");
             _mapper = mapper;
-            this.environment = env;
-            this.saveImage = saveImage;
+            _environment = env;
+            _saveImage = saveImage;
         }
 
         public async Task<IEnumerable<UserDTO>> Get()
@@ -227,7 +228,7 @@ namespace E_cart.Repository
                     throw new Exception("Invalid Enrty");
                 };
                 var admn = await _dataContext.Users
-                          .SingleOrDefaultAsync(e => e.Email.ToLower() == loginReq.Username.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
+                          .SingleOrDefaultAsync(e => e.Username.ToLower() == loginReq.Username.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
 
                 if (admn == null)
                 {
@@ -263,7 +264,7 @@ namespace E_cart.Repository
             }
         }
 
-        public async Task<UserDataDTO> SignUP(CreateUserDTO usr)
+        public async Task<UserDataDTO> SignUP([FromForm] CreateUserDTO usr)
         {
             try
             {
@@ -271,16 +272,6 @@ namespace E_cart.Repository
                 {
                     throw new Exception("Invalid entry");
                 }
-               // string uniqueFileName = Guid.NewGuid().ToString() + "_" + usr.Imageurl.FileName;
-
-                // Combine the path to the "images" folder with the unique filename
-               // string imagePath = Path.Combine(environment.WebRootPath, "images", uniqueFileName);
-
-                // Save the image to the "images" folder
-               // using (var fileStream = new FileStream(imagePath, FileMode.Create))
-               // {
-                //    usr.Imageurl.CopyTo(fileStream);
-                //}
                 var user = new User
                 {
                     Username = usr.Username,
@@ -288,9 +279,8 @@ namespace E_cart.Repository
                     Lastname = usr.Lastname,
                     Email = usr.Email,
                     Password = BCrypt.Net.BCrypt.HashPassword(usr.Password, 10),
-                    Imageurl = usr.Imageurl,
-                    //Imageurl = await saveImage.SaveImages(usr.Imageurl, "image"),
-                    //Imageurl = "/images/" + uniqueFileName,
+                    //Imageurl = usr.Imageurl,
+                    Imageurl = await _saveImage.SaveImages(usr.Imageurl, "image/users"),
                     Number = usr.Number,
                     Role = "user"
                 };
@@ -304,6 +294,26 @@ namespace E_cart.Repository
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+
+        public async Task<bool> Delete(int Id)
+        {
+            try
+            {
+                var itm = await _dataContext.Users.FirstOrDefaultAsync(x => x.Id == Id);
+                if (itm == null)
+                {
+                    throw new Exception("Not Found");
+                }
+                _dataContext.Users.Remove(itm);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return false;
             }
         }
     }

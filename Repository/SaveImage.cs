@@ -2,11 +2,11 @@
 {
     public class SaveImage
     {
-        private readonly IWebHostEnvironment environment;
+        private readonly IWebHostEnvironment _environment;
 
         public SaveImage(IWebHostEnvironment environment)
         {
-            this.environment = environment;
+            _environment = environment;
         }
 
         public async Task<string> SaveImages(IFormFile image, string directory)
@@ -17,28 +17,28 @@
             }
 
             var ext = Path.GetExtension(image.FileName);
-            var allowedExtension = new string[] { ".jpg", ".jpeg", ".png" };
-            if (!allowedExtension.Contains(ext))
+            var allowedExtensions = new string[] { ".jpg", ".jpeg", ".png" };
+            if (!allowedExtensions.Contains(ext))
             {
-                throw new ArgumentException($"Extension not allowed, Only {allowedExtension} is allowed");
+                throw new ArgumentException($"Extension not allowed, Only {allowedExtensions} are allowed");
             }
 
-            var contentPath = this.environment.ContentRootPath;
-            var imagePath = Path.Combine(contentPath, directory);
-            if (!Directory.Exists(imagePath))
+            var contentPath = _environment.ContentRootPath;
+            var path = Path.Combine(contentPath, directory);
+            if (!Directory.Exists(path))
             {
-                Directory.CreateDirectory(imagePath);
+                Directory.CreateDirectory(path);
             }
 
-            string uniqueFileName = Guid.NewGuid().ToString();
-            var fileName = uniqueFileName + ext;
-            var fileWithPath = Path.Combine(imagePath, fileName);
+            string uniqueString = Guid.NewGuid().ToString();
+            var newfileName = uniqueString + ext;
+            var fileWithPath = Path.Combine(path, newfileName);
 
             using (var stream = new FileStream(fileWithPath, FileMode.Create))
             {
                 await image.CopyToAsync(stream);
             }
-            return fileName;
+            return newfileName;
         }
     }
 }

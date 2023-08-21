@@ -15,6 +15,8 @@ namespace E_cart.Repository.Interface
 
         Task<bool> DoCheckout(int userId);
 
-        Task<bool> IncreaseQuantity(int cartDetailId);
+        Task<bool> IncreaseQuantity(int userId, int ProdID);
+
+        Task<bool> DecreaseQuantity(int userId, int ProdID);
     }
 }

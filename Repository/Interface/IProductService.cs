@@ -9,8 +9,10 @@ namespace E_cart.Repository.Interface
         Task<IEnumerable<ProductDTO>> Get();
         Task<Product> GetById(int id);
         Task<IEnumerable<ProductDTO>> GetProductsByCategory(string categoryName);
-        Task <Product> Post(CreateProductDTO item);
+        Task<Product> Post([FromForm] CreateProductDTO item);
         Task<Product> Put(int Id, UpdateProductDTO item);
         Task<bool> Delete(int Id);
+
+        Task <bool> DeleteImage(string imageFileName);
     }
 }

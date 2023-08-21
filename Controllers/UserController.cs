@@ -52,7 +52,7 @@ namespace E_cart.Controllers
         }
 
         [HttpPost("api/user/Signup")]
-        public async Task<IActionResult> SignUp(CreateUserDTO usr)
+        public async Task<IActionResult> SignUp([FromForm]CreateUserDTO usr)
         {
             var user = await userService.SignUP(usr);
             if (user == null)
@@ -82,6 +82,24 @@ namespace E_cart.Controllers
                 return BadRequest("Inavlid Credential");
             }
             return Ok(emp);
+        }
+
+        [HttpDelete("DeleteUser")]
+        public async Task<IActionResult> Delete(int Id)
+        {
+            try
+            {
+                var itm = await userService.Delete(Id);
+                if (!itm)
+                {
+                    return BadRequest("Error");
+                }
+                return Ok("Removed Successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

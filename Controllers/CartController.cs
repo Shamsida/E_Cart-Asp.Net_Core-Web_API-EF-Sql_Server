@@ -75,15 +75,42 @@ namespace E_cart.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPut("IncreaseQuantity")]
-        public async Task<IActionResult> IncreaseQuantity(int cartDetailId)
+        public async Task<IActionResult> IncreaseQuantity(int userId, int ProdID)
         {
-            var user = await cartService.IncreaseQuantity(cartDetailId);
-            if (user == null)
+            try
             {
-                return BadRequest();
+                var itm = await cartService.IncreaseQuantity(userId, ProdID);
+                if (!itm)
+                {
+                    return BadRequest("Error");
+                }
+                return Ok("Quantity Added By One");
             }
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+        [HttpPut("DecreaseQuantity")]
+        public async Task<IActionResult> DecreaseQuantity(int userId, int ProdID)
+        {
+            try
+            {
+                var itm = await cartService.DecreaseQuantity(userId, ProdID);
+                if (!itm)
+                {
+                    return BadRequest("Error");
+                }
+                return Ok("Quantity Removed By One");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

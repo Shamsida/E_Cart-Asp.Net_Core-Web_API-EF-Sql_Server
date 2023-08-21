@@ -55,6 +55,14 @@ namespace E_cart
             builder.Services.AddScoped<IWishlistService , WishlistService>();
             builder.Services.AddScoped<SaveImage>();
 
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(20);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -76,13 +84,20 @@ namespace E_cart
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "Images")),
-                RequestPath = "/Image"
+                FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "Image/Products")),
+                RequestPath = "/Resources"
+            });
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "Image/Users")),
+                RequestPath = "/Resources"
             });
 
             app.UseHttpsRedirection();
 
             app.UseCors();
+
+            app.UseSession();
 
             app.UseAuthorization();
 

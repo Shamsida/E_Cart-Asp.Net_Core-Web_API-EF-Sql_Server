@@ -168,6 +168,7 @@ namespace E_cart.Repository
                 var cart = await _dataContext.Carts
                             .Include(c => c.CartDetails)
                             .FirstOrDefaultAsync(c => c.User.Id == userId);
+
                 if (cart == null)
                 {
                     throw new Exception("Invalid Cart.");
@@ -195,6 +196,12 @@ namespace E_cart.Repository
 
                 cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
                 await _dataContext.SaveChangesAsync();
+
+                if (cart.CartDetails.Count == 0)
+                {
+                    _dataContext.Carts.Remove(cart);
+                    await _dataContext.SaveChangesAsync();
+                }
 
                 return true;
             }
@@ -240,6 +247,7 @@ namespace E_cart.Repository
                     {
                         UserId = userId,
                         CreateDate = DateTime.UtcNow,
+                        TotalPrice = cart.TotalPrice,
                         OrderDetail = new List<OrderDetail>()
                     };
                     foreach (var cartItem in cartDetail)
@@ -306,31 +314,92 @@ namespace E_cart.Repository
 
         }
 
-        public async Task<bool> IncreaseQuantity(int cartDetailId)
+        public async Task<bool> IncreaseQuantity(int userId, int ProdID)
         {
             try
             {
-                var cartDetail = await _dataContext.CartDetails
-                    .Include(cd => cd.Cart)
-                    .FirstOrDefaultAsync(cd => cd.Id == cartDetailId);
+                var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-                if (cartDetail == null)
+                if (user == null)
                 {
-                    throw new Exception("Cart detail not found.");
+                    throw new Exception("User not found.");
                 }
 
-                var product = await _dataContext.Products.FirstOrDefaultAsync(p => p.Id == cartDetail.ProductId);
-                if (product == null)
+                var cart = await _dataContext.Carts
+                            .Include(c => c.CartDetails)
+                            .FirstOrDefaultAsync(c => c.User.Id == userId);
+
+                if (cart == null)
                 {
-                    throw new Exception("Product not found.");
+                    throw new Exception("Cart not found.");
                 }
 
-                cartDetail.Quantity++;
-                cartDetail.Total = cartDetail.Quantity * cartDetail.UnitPrice;
+                var cartItem = cart.CartDetails.FirstOrDefault(a => a.ProductId == ProdID);
 
-                cartDetail.Cart.TotalPrice = cartDetail.Cart.CartDetails.Sum(cd => cd.Total);
+                if (cartItem == null)
+                {
+                    throw new Exception("Product not found in cart.");
+                }
+
+                cartItem.Quantity++;
+                cartItem.Total = cartItem.Quantity * cartItem.UnitPrice;
+
+                cartItem.Cart.TotalPrice = cartItem.Cart.CartDetails.Sum(cd => cd.Total);
 
                 await _dataContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return false;
+            }
+        }
+
+        public async Task<bool> DecreaseQuantity(int userId, int ProdID)
+        {
+            try
+            {
+                var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    throw new Exception("User not found.");
+                }
+
+                var cart = await _dataContext.Carts
+                            .Include(c => c.CartDetails)
+                            .FirstOrDefaultAsync(c => c.User.Id == userId);
+
+                if (cart == null)
+                {
+                    throw new Exception("Cart not found.");
+                }
+
+                var cartItem = cart.CartDetails.FirstOrDefault(a => a.ProductId == ProdID);
+
+                if (cartItem == null)
+                {
+                    throw new Exception("Product not found in cart.");
+                }
+
+                if (cartItem.Quantity > 1)
+                {
+                    cartItem.Quantity--;
+                    cartItem.Total -= cartItem.UnitPrice;
+                    await _dataContext.SaveChangesAsync();
+
+                    cart.TotalPrice -= cartItem.UnitPrice;
+                    await _dataContext.SaveChangesAsync();
+                }
+                else
+                {
+                    cart.CartDetails.Remove(cartItem);
+                    _dataContext.CartDetails.Remove(cartItem);
+                    cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
+                    await _dataContext.SaveChangesAsync();
+                }
 
                 return true;
             }

@@ -8,6 +8,9 @@ namespace E_cart.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
+        public decimal TotalPrice { get; set; }
+
         [Required]
         public int UserId { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.UtcNow;

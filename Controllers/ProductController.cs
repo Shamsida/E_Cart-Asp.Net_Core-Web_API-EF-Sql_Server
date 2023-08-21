@@ -12,7 +12,7 @@ namespace E_cart.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService productService;
-        protected Response res;
+        private Response res;
 
         public ProductController(IProductService productService)
         {
@@ -61,7 +61,7 @@ namespace E_cart.Controllers
 
 
         [HttpPost("PostItems")]
-        public async Task<IActionResult> Post(CreateProductDTO item)
+        public async Task<IActionResult> Post([FromForm] CreateProductDTO item)
         {
             var itm = await productService.Post(item);
             if (itm == null)
@@ -88,6 +88,24 @@ namespace E_cart.Controllers
             try
             {
                 var itm = await productService.Delete(Id);
+                if (!itm)
+                {
+                    return BadRequest("Error");
+                }
+                return Ok("Removed Successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteImage")]
+        public async Task<IActionResult> DeleteImage(string imageFileName)
+        {
+            try
+            {
+                var itm = await productService.DeleteImage(imageFileName);
                 if (!itm)
                 {
                     return BadRequest("Error");

@@ -102,6 +102,9 @@ namespace E_cart.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -237,7 +240,7 @@ namespace E_cart.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WishList");
+                    b.ToTable("wishlist");
                 });
 
             modelBuilder.Entity("E_cart.Models.Cart", b =>
@@ -317,15 +320,13 @@ namespace E_cart.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("E_cart.Models.User", "User")
+                    b.HasOne("E_cart.Models.User", null)
                         .WithMany("WishList")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("E_cart.Models.Cart", b =>

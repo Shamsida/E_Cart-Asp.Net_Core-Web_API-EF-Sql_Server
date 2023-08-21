@@ -12,10 +12,14 @@ namespace E_cart.Repository
     {
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
-        public ProductService(DataContext dataContext,IMapper mapper)
+        private readonly IWebHostEnvironment _environment;
+        private readonly SaveImage _saveImage;
+        public ProductService(DataContext dataContext,IMapper mapper, IWebHostEnvironment environment, SaveImage saveImage)
         {
             _dataContext = dataContext;
             _mapper = mapper;
+            _environment = environment;
+            _saveImage = saveImage;
         }
 
 
@@ -79,7 +83,7 @@ namespace E_cart.Repository
             }
         }
 
-        public async Task<Product> Post(CreateProductDTO item)
+        public async Task<Product> Post([FromForm]CreateProductDTO item)
         {
             try
             {
@@ -100,7 +104,8 @@ namespace E_cart.Repository
                     CategoryId = category.CategoryId,
                     Title = item.Title,
                     Description = item.Description,
-                    Image = item.Image,
+                    //Image = item.Image,
+                    Image = await _saveImage.SaveImages(item.Image, "image/products"),
                     Price = item.Price,
                     //Category =await _dataContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == item.CategoryId)
                     Category = category,
@@ -176,6 +181,25 @@ namespace E_cart.Repository
             catch (Exception ex)
             {
                 throw;
+                return false;
+            }
+        }
+
+        public async Task <bool> DeleteImage(string imageFileName)
+        {
+            try
+            {
+                var wwwPath = _environment.ContentRootPath;
+                var path = Path.Combine(wwwPath, "Image\\", imageFileName);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
                 return false;
             }
         }
