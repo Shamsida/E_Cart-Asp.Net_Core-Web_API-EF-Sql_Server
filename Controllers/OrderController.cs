@@ -1,4 +1,7 @@
-﻿using E_cart.Repository.Interface;
+﻿using E_cart.DTO.CartDto;
+using E_cart.DTO.OrderDto;
+using E_cart.Repository;
+using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +38,17 @@ namespace E_cart.Controllers
                 return NotFound();
             }
             return Ok(itm);
+        }
+
+        [HttpPost("AddToOrder")]
+        public async Task<IActionResult> AddToOrder(int userId, [FromBody] OrderCreateDTO itm)
+        {
+            var user = await orderService.AddToOrder(userId, itm);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            return Ok(user);
         }
     }
 }

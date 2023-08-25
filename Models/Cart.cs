@@ -9,7 +9,14 @@ namespace E_cart.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [NotMapped]
+        public string? StripePaymentIntentId { get; set; }
+
         public decimal TotalPrice { get; set; }
+        public int TotalItems { get; set; }
+
+        [NotMapped]
+        public string ClientSecret { get; set; }
 
         [Required]
         public User User { get; set; }
