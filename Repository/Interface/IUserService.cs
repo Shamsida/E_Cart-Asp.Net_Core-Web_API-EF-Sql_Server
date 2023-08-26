@@ -12,6 +12,7 @@ namespace E_cart.Repository.Interface
         Task<UserDataDTO> SignUP([FromForm] CreateUserDTO usr);
         Task<LoginResDTO> Login(LoginReqDTO loginReq);
         Task<LoginResDTO> AdminLogin(LoginReqDTO loginReq);
+        Task<UserDataDTO> AdminSignUP([FromForm] CreateUserDTO usr);
         Task<bool> Delete(int Id);
     }
 }

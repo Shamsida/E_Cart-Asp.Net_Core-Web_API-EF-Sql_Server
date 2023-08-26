@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace E_cart.Migrations
 {
     /// <inheritdoc />
-    public partial class userupdate : Migration
+    public partial class InitialData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,7 +37,7 @@ namespace E_cart.Migrations
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Imageurl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Number = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Number = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,6 +73,8 @@ namespace E_cart.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalItems = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -92,8 +94,16 @@ namespace E_cart.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    PickupAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PickupPhoneNumber = table.Column<double>(type: "float", nullable: false),
+                    PickupEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StripePaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalItems = table.Column<int>(type: "int", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,7 +117,7 @@ namespace E_cart.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WishList",
+                name: "wishlist",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -117,15 +127,15 @@ namespace E_cart.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WishList", x => x.Id);
+                    table.PrimaryKey("PK_wishlist", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WishList_Products_ProductId",
+                        name: "FK_wishlist_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WishList_Users_UserId",
+                        name: "FK_wishlist_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -226,13 +236,13 @@ namespace E_cart.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WishList_ProductId",
-                table: "WishList",
+                name: "IX_wishlist_ProductId",
+                table: "wishlist",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WishList_UserId",
-                table: "WishList",
+                name: "IX_wishlist_UserId",
+                table: "wishlist",
                 column: "UserId");
         }
 
@@ -246,7 +256,7 @@ namespace E_cart.Migrations
                 name: "OrderDetails");
 
             migrationBuilder.DropTable(
-                name: "WishList");
+                name: "wishlist");
 
             migrationBuilder.DropTable(
                 name: "Carts");

@@ -7,6 +7,7 @@ using E_cart.Models;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace E_cart.Repository
 {
@@ -45,6 +46,7 @@ namespace E_cart.Repository
                 {
                     CartId = c.Id,
                     TotalPrice = c.TotalPrice,
+                    TotalItems = c.TotalItems,
                     //User = new UserDataDTO
                     //{
                     //    UserId = c.User.Id,
@@ -144,6 +146,7 @@ namespace E_cart.Repository
                 }
 
                 cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
+                cart.TotalItems = cart.CartDetails.Sum(cd => cd.Quantity);
                 _dataContext.SaveChanges();
 
                 return cart;
@@ -195,6 +198,7 @@ namespace E_cart.Repository
                 }
 
                 cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
+                cart.TotalItems = cart.CartDetails.Sum(cd => cd.Quantity);
                 await _dataContext.SaveChangesAsync();
 
                 if (cart.CartDetails.Count == 0)
@@ -345,6 +349,7 @@ namespace E_cart.Repository
                 cartItem.Total = cartItem.Quantity * cartItem.UnitPrice;
 
                 cartItem.Cart.TotalPrice = cartItem.Cart.CartDetails.Sum(cd => cd.Total);
+                cartItem.Cart.TotalItems = cartItem.Cart.CartDetails.Sum(cd => cd.Quantity);
 
                 await _dataContext.SaveChangesAsync();
 
@@ -391,6 +396,7 @@ namespace E_cart.Repository
                     await _dataContext.SaveChangesAsync();
 
                     cart.TotalPrice -= cartItem.UnitPrice;
+                    cart.TotalItems = cart.CartDetails.Sum(cd => cd.Quantity);
                     await _dataContext.SaveChangesAsync();
                 }
                 else
@@ -398,6 +404,7 @@ namespace E_cart.Repository
                     cart.CartDetails.Remove(cartItem);
                     _dataContext.CartDetails.Remove(cartItem);
                     cart.TotalPrice = cart.CartDetails.Sum(cd => cd.Total);
+                    cart.TotalItems = cart.CartDetails.Sum(cd => cd.Quantity);
                     await _dataContext.SaveChangesAsync();
                 }
 

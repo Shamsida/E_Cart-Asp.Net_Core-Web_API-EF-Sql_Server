@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_cart.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230807103118_cartcontroller")]
-    partial class cartcontroller
+    [Migration("20230826061918_Initial Data")]
+    partial class InitialData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace E_cart.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("TotalItems")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
@@ -104,6 +107,32 @@ namespace E_cart.Migrations
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PickupAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PickupEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("PickupPhoneNumber")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StripePaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalItems")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -201,8 +230,8 @@ namespace E_cart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal>("Number")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Number")
+                        .HasColumnType("float");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -240,7 +269,7 @@ namespace E_cart.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WishList");
+                    b.ToTable("wishlist");
                 });
 
             modelBuilder.Entity("E_cart.Models.Cart", b =>
@@ -320,15 +349,13 @@ namespace E_cart.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("E_cart.Models.User", "User")
+                    b.HasOne("E_cart.Models.User", null)
                         .WithMany("WishList")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("E_cart.Models.Cart", b =>

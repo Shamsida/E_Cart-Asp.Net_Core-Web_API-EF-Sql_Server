@@ -2,6 +2,7 @@
 using E_cart.DTO.OrderDto;
 using E_cart.Repository;
 using E_cart.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,7 @@ namespace E_cart.Controllers
             return Ok(itm);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("GetOrders")]
         public async Task<IActionResult> GetOrders()
         {

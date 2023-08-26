@@ -2,6 +2,7 @@
 using E_cart.Models;
 using E_cart.Repository;
 using E_cart.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace E_cart.Controllers
             this.userService = userService;
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("api/user/GetUsers")]
         public async Task<IActionResult> Get()
         {
@@ -82,6 +84,17 @@ namespace E_cart.Controllers
                 return BadRequest("Inavlid Credential");
             }
             return Ok(emp);
+        }
+
+        [HttpPost("api/user/AdminSignup")]
+        public async Task<IActionResult> AdminSignUp([FromForm] CreateUserDTO usr)
+        {
+            var user = await userService.AdminSignUP(usr);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            return Ok(user);
         }
 
         [HttpDelete("DeleteUser")]

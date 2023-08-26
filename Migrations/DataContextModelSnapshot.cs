@@ -227,8 +227,8 @@ namespace E_cart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal>("Number")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Number")
+                        .HasColumnType("float");
 
                     b.Property<string>("Password")
                         .IsRequired()

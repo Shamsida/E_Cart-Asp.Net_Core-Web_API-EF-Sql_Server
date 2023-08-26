@@ -26,6 +26,6 @@ namespace E_cart.DTO.UserDto
         public IFormFile? Imageurl { get; set; }
 
         [Required]
-        public decimal Number { get; set; } = 0;
+        public double Number { get; set; } = 0;
     }
 }

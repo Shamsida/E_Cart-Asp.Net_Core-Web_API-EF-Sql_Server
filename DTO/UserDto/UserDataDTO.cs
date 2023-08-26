@@ -13,6 +13,6 @@
 
         public string? Role { get; set; }
 
-        public decimal Number { get; set; } = 0;
+        public double Number { get; set; } = 0;
     }
 }

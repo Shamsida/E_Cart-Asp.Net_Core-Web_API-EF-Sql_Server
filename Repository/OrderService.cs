@@ -99,6 +99,7 @@ namespace E_cart.Repository
                     StripePaymentIntentId = itm.StripePaymentIntentId,
                     TotalItems = itm.TotalItems,
                     Status = String.IsNullOrEmpty(itm.Status) ? "pending" : itm.Status,
+                    PaymentStatus = itm.PaymentStatus,
                     OrderDetail = new List<OrderDetail>()
                 };
                 if (itm.TotalItems > 0)

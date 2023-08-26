@@ -20,7 +20,7 @@ namespace E_cart.DTO.UserDto
 
         public string? Imageurl { get; set; }
 
-        public decimal Number { get; set; } = 0;
+        public double Number { get; set; } = 0;
 
         public List<CartDTO> Carts { get; set; }
     }

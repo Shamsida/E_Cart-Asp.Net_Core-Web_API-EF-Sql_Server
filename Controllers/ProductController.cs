@@ -4,6 +4,7 @@ using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace E_cart.Controllers
 {
@@ -60,6 +61,7 @@ namespace E_cart.Controllers
         }
 
 
+        [Authorize(Roles = "admin")]
         [HttpPost("PostItems")]
         public async Task<IActionResult> Post([FromForm] CreateProductDTO item)
         {
@@ -71,6 +73,7 @@ namespace E_cart.Controllers
             return CreatedAtAction(nameof(GetById), new {id = itm.Id},itm);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPut("PutItems")]
         public async Task<IActionResult> Put(int Id, UpdateProductDTO item)
         {
@@ -82,6 +85,7 @@ namespace E_cart.Controllers
             return Ok(itm);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("DeleteItems")]
         public async Task<IActionResult> Delete(int Id)
         {

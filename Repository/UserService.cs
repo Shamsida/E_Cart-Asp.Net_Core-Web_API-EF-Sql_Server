@@ -230,7 +230,8 @@ namespace E_cart.Repository
                 var admn = await _dataContext.Users
                           .SingleOrDefaultAsync(e => e.Username.ToLower() == loginReq.Username.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
 
-                if (admn == null)
+                //bool isPasswordValid = BCrypt.Net.BCrypt.Verify(admn.Password, loginReq.Password);
+                if (admn == null || !BCrypt.Net.BCrypt.Verify(admn.Password, loginReq.Password)) 
                 {
                     throw new Exception("Invalid user name or password");
                 }
@@ -283,6 +284,39 @@ namespace E_cart.Repository
                     Imageurl = await _saveImage.SaveImages(usr.Imageurl, "image/users"),
                     Number = usr.Number,
                     Role = "user"
+                };
+
+                _dataContext.Users.Add(user);
+                await _dataContext.SaveChangesAsync();
+                var usrDto = _mapper.Map<UserDataDTO>(user);
+                return usrDto;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<UserDataDTO> AdminSignUP([FromForm] CreateUserDTO usr)
+        {
+            try
+            {
+                if (usr == null)
+                {
+                    throw new Exception("Invalid entry");
+                }
+                var user = new User
+                {
+                    Username = usr.Username,
+                    Firstname = usr.Firstname,
+                    Lastname = usr.Lastname,
+                    Email = usr.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(usr.Password, 10),
+                    //Imageurl = usr.Imageurl,
+                    Imageurl = await _saveImage.SaveImages(usr.Imageurl, "image/users"),
+                    Number = usr.Number,
+                    Role = "admin"
                 };
 
                 _dataContext.Users.Add(user);
