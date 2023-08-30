@@ -228,10 +228,10 @@ namespace E_cart.Repository
                     throw new Exception("Invalid Enrty");
                 };
                 var admn = await _dataContext.Users
-                          .SingleOrDefaultAsync(e => e.Username.ToLower() == loginReq.Username.ToLower() && e.Password == loginReq.Password && e.Role == "admin");
+                          .FirstOrDefaultAsync(e => e.Username.ToLower() == loginReq.Username.ToLower() && e.Role == "admin");
 
                 //bool isPasswordValid = BCrypt.Net.BCrypt.Verify(admn.Password, loginReq.Password);
-                if (admn == null || !BCrypt.Net.BCrypt.Verify(admn.Password, loginReq.Password)) 
+                if (admn == null || !BCrypt.Net.BCrypt.Verify(loginReq.Password, admn.Password)) 
                 {
                     throw new Exception("Invalid user name or password");
                 }

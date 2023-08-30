@@ -15,6 +15,6 @@ namespace E_cart.DTO.OrderDto
         public string? Status { get; set; }
         public int TotalItems { get; set; }
         public string? PaymentStatus { get; set; }
-        public List<OrderDetailCreateDTO> OrderDetails { get; set; }
+        //public List<OrderDetailCreateDTO> OrderDetails { get; set; }
     }
 }

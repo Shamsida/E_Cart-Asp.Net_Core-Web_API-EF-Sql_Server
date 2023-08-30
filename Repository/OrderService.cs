@@ -107,9 +107,10 @@ namespace E_cart.Repository
                     _dataContext.Orders.Add(order);
                     _dataContext.SaveChanges();
                     foreach (var cartItem in cartDetail)
-                    {
+                    {   
                         var orderDetail = new OrderDetail
                         {
+                            OrderId = order.Id,
                             ProductId = cartItem.ProductId,
                             Quantity = cartItem.Quantity,
                             UnitPrice = cartItem.UnitPrice,

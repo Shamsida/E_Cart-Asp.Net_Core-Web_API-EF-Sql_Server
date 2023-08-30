@@ -37,7 +37,7 @@ namespace E_cart.Controllers
             decimal amount = cart.TotalPrice;
             PaymentIntentCreateOptions intent = new PaymentIntentCreateOptions()
             {
-                Amount = (long?)amount,
+                Amount = (long?)amount * 100 ,
                 Currency = "Inr",
                 PaymentMethodTypes = new List<string>
                   {
@@ -50,6 +50,7 @@ namespace E_cart.Controllers
             cart.ClientSecret = paymentIntent.ClientSecret;
             response.Success = true;
             response.StatusCode = HttpStatusCode.OK;
+            response.Result = cart;
             return Ok(response);
         }
     }
