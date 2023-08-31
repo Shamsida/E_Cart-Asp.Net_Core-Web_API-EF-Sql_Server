@@ -19,10 +19,21 @@ namespace E_cart.Controllers
             this.orderService = orderService;
         }
 
-        [HttpGet("GetOrderById")]
+        [HttpGet("GetOrderByUserId")]
         public async Task<IActionResult> UserOrders(int userId)
         {
             var itm = await orderService.UserOrders(userId);
+            if (itm == null)
+            {
+                return NotFound();
+            }
+            return Ok(itm);
+        }
+
+        [HttpGet("GetOrderById")]
+        public async Task<IActionResult> UsersOrder(int Id)
+        {
+            var itm = await orderService.UsersOrder(Id);
             if (itm == null)
             {
                 return NotFound();

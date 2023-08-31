@@ -42,6 +42,31 @@ namespace E_cart.Repository
             }
         }
 
+        public async Task<IEnumerable<Order>> UsersOrder(int Id)
+        {
+            try
+            {
+                var order = await _dataContext.Users.Where(u => u.Id == Id).FirstOrDefaultAsync();
+
+                if (order == null)
+                {
+                    throw new Exception("Order not found.");
+                }
+
+                var orders = await _dataContext.Orders
+                            .Include(x => x.OrderDetail)
+                            .ThenInclude(x => x.Product)
+                            .Where(a => a.Id == Id)
+                            .ToListAsync();
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return null;
+            }
+        }
+
         public async Task<IEnumerable<Order>> GetOrders()
         {
             try
