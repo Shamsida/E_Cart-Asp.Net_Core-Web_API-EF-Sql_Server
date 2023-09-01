@@ -1,6 +1,7 @@
 ﻿using Azure;
 using E_cart.Data;
 using E_cart.DTO.OrderDto;
+using E_cart.DTO.ProductDto;
 using E_cart.Models;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +47,7 @@ namespace E_cart.Repository
         {
             try
             {
-                var order = await _dataContext.Users.Where(u => u.Id == Id).FirstOrDefaultAsync();
+                var order = await _dataContext.Orders.Where(u => u.Id == Id).FirstOrDefaultAsync();
 
                 if (order == null)
                 {
@@ -144,6 +145,14 @@ namespace E_cart.Repository
                         _dataContext.OrderDetails.Add(orderDetail);
                     }
                     _dataContext.SaveChanges();
+                    _dataContext.CartDetails.RemoveRange(cartDetail);
+                    await _dataContext.SaveChangesAsync();
+
+                    if (cart.CartDetails.Count == 0)
+                    {
+                        _dataContext.Carts.Remove(cart);
+                        await _dataContext.SaveChangesAsync();
+                    }
                     //_response.Result = order;
                     //order.OrderDetails = null;
                     //_response.StatusCode = HttpStatusCode.Created;
@@ -155,6 +164,65 @@ namespace E_cart.Repository
             {
                 throw;
                 return null;
+            }
+        }
+        public async Task<Order> Put(int Id, OrderUpdateDTO item)
+        {
+            try
+            {
+                if (item == null)
+                {
+                    throw new Exception("Invalid entry");
+                }
+                var itm = await _dataContext.Orders.FirstOrDefaultAsync(x => x.Id == Id);
+                if (itm == null)
+                {
+                    throw new Exception("Order Not Found");
+                }
+
+                itm.CreateDate = DateTime.Now;
+                itm.Status = item.Status;
+
+                await _dataContext.SaveChangesAsync();
+                return itm;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return null;
+            }
+        }
+
+        public async Task<bool> RemoveFromOrder(int userId, int orderID)
+        {
+            try
+            {
+                var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    throw new Exception("User not found.");
+                }
+
+                var order = await _dataContext.Orders
+                            .Where(c=> c.Id == orderID)
+                            .FirstOrDefaultAsync(c => c.UserId == userId);
+
+                if (order == null)
+                {
+                    throw new Exception("Invalid Order.");
+                }
+
+                _dataContext.Orders.Remove(order);
+                await _dataContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                return false;
             }
         }
     }

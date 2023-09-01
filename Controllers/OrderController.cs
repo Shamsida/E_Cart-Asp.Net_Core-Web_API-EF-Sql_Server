@@ -1,10 +1,12 @@
 ﻿using E_cart.DTO.CartDto;
 using E_cart.DTO.OrderDto;
+using E_cart.DTO.ProductDto;
 using E_cart.Repository;
 using E_cart.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 
 namespace E_cart.Controllers
 {
@@ -62,6 +64,35 @@ namespace E_cart.Controllers
                 return BadRequest();
             }
             return Ok(user);
+        }
+
+        [HttpPut("PutItems")]
+        public async Task<IActionResult> Put(int Id, OrderUpdateDTO item)
+        {
+            var itm = await orderService.Put(Id, item);
+            if (itm == null)
+            {
+                return BadRequest("Inavlid Credential");
+            }
+            return Ok(itm);
+        }
+
+        [HttpDelete("DeleteOrder")]
+        public async Task<IActionResult> RemoveFromOrder(int userId, int orderID)
+        {
+            try
+            {
+                var itm = await orderService.RemoveFromOrder(userId, orderID);
+                if (!itm)
+                {
+                    return BadRequest("Error");
+                }
+                return Ok("Removed Successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

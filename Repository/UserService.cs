@@ -81,7 +81,7 @@ namespace E_cart.Repository
                 var items = await _dataContext.Users
                             .Include(u => u.Carts)
                             .ThenInclude(c => c.CartDetails)
-                            .Where(x => x.Role == "user")
+                            //.Where(x => x.Role == "user")
                             .FirstOrDefaultAsync(u => u.Id == id);
 
                 if (items == null)
@@ -130,7 +130,7 @@ namespace E_cart.Repository
                 var items = await _dataContext.Users
                             .Include(u => u.Carts)
                             .ThenInclude(c => c.CartDetails)
-                            .Where(x => x.Role == "user")
+                            //.Where(x => x.Role == "user")
                             .FirstOrDefaultAsync(u => u.Username == username);
 
                 if (items == null)
